@@ -1,0 +1,267 @@
+<!doctype html>
+<html lang="de-CH">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Flexbox-Labor · Modul 287</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; background: #f3f5fa; color: #182238; font: 1rem/1.55 system-ui, sans-serif; }
+header { background: #14213b; color: white; padding: 2rem max(1rem, calc((100% - 72rem)/2)); }
+header p { margin: .3rem 0 0; }
+h1, h2 { line-height: 1.15; margin: 0 0 .7rem; }
+main { max-width: 74rem; margin: auto; padding: 1rem; display: grid; grid-template-columns: minmax(16rem, 1fr) minmax(0, 2fr); gap: 1rem; align-items: start; }
+section, aside { background: white; padding: 1rem; border: 1px solid #dbe1ec; border-radius: .85rem; }
+fieldset { border: 1px solid #dbe1ec; border-radius: .6rem; margin: 1rem 0; min-width: 0; }
+legend { font-weight: 700; }
+label { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .3rem; margin: .55rem 0; }
+select, input, button { font: inherit; max-width: 100%; }
+select, input[type=number], button { padding: .28rem .5rem; border: 1px solid #7a89a2; border-radius: .35rem; background: white; color: inherit; }
+input[type=number] { width: 5rem; }
+button { cursor: pointer; }
+button:hover { background: #e5edff; }
+:focus-visible { outline: 3px solid #2355d5; outline-offset: 2px; }
+.preview { overflow: auto; background: #eef2fb; padding: .6rem; border-radius: .5rem; }
+.stage { display: flex; min-width: 15rem; height: 20rem; border: 2px dashed #8291ab; overflow: auto; }
+.item { min-width: 0; min-height: 0; display: grid; place-items: center; padding: 0; color: #10264f; background: #afc8ff; border-radius: .45rem; font-weight: 800; }
+.item:nth-child(3n+2) { background: #a8e3d5; }
+.item:nth-child(3n) { background: #ffd495; }
+.item[data-selected] { box-shadow: inset 0 0 0 3px #2355d5; }
+pre { background: #14213b; color: #eaf1ff; padding: 1rem; border-radius: .5rem; overflow: auto; }
+details { margin: .6rem 0; }
+summary { cursor: pointer; font-weight: 650; }
+.muted { color: #475671; }
+@media (max-width: 720px) { main { grid-template-columns: 1fr; } }
+.help { position: relative; display: inline-flex; min-width: 0; max-width: 100%; }
+fieldset label { display: grid; justify-content: stretch; }
+fieldset select { width: 100%; }
+fieldset .help { display: block; }
+.tooltip { position: absolute; left: 0; top: 100%; z-index: 3; width: min(16rem, 72vw); padding: .55rem .7rem; background: #14213b; color: white; border-radius: .4rem; box-shadow: 0 3px 10px #14213b44; }
+aside > label .tooltip { left: auto; right: 0; }
+
+</style>
+</head>
+<body>
+<header>
+<p>Modul 287 · HTML und CSS</p>
+<h1>Flexbox-Labor</h1>
+<p>Verändere die Einstellungen und beobachte, wie der Browser die Elemente anordnet.</p>
+</header>
+<main>
+<aside aria-labelledby="settings">
+<h2 id="settings">Einstellungen</h2>
+<button id="reset" type="button">Zurücksetzen</button>
+<fieldset id="container-controls"><legend>Flex-Container</legend></fieldset>
+<label>Anzahl Elemente <input id="count" type="number" min="1" max="9" value="3"></label>
+<label>Containerbreite <input id="width" type="range" min="45" max="100" value="100" aria-describedby="width-value"><output id="width-value">100 %</output></label>
+<fieldset id="item-controls">
+<legend>Flex-Element</legend>
+<label>Element auswählen <select id="selected"></select></label>
+</fieldset>
+</aside>
+<section aria-labelledby="preview-title">
+<h2 id="preview-title">Vorschau</h2>
+<p id="axes" class="muted"></p>
+<div class="preview"><div id="stage" class="stage"></div></div>
+<p class="muted">Der gestrichelte Rahmen zeigt den Container. Die blaue Umrandung markiert das ausgewählte Element.</p>
+<h2>CSS und HTML</h2>
+<button id="copy" type="button">CSS kopieren</button>
+<span id="status" role="status"></span>
+<pre id="css" tabindex="0"><code></code></pre>
+<details><summary>Passendes HTML anzeigen</summary><pre id="html" tabindex="0"><code></code></pre></details>
+<h2>Ausprobieren</h2>
+<details><summary>1. Ein Element mittig platzieren</summary><p>Stelle die Anzahl auf 1. Zentriere das Element horizontal und vertikal. Wechsle danach von <code>row</code> zu <code>column</code>. Welche Eigenschaft wirkt jetzt auf welche Achse?</p><p>Tipp: Setze <code>justify-content</code> und <code>align-items</code> auf <code>center</code>.</p></details>
+<details><summary>2. Eine Navigation mit Umbruch bauen</summary><p>Wähle <code>row</code> und 6 Elemente. Verkleinere die Containerbreite. Stelle <code>flex-wrap</code> auf <code>wrap</code> und vergleiche. Wie kannst du die entstandenen Zeilen als Gruppe vertikal verteilen?</p><p>Tipp: Mit mehreren Zeilen und freiem Platz auf der Querachse wirkt <code>align-content</code>.</p></details>
+<details><summary>3. Freien Platz im Verhältnis 1 zu 2 verteilen</summary><p>Setze das Labor zurück. Gib Element 1 den Wert <code>flex-grow: 1</code> und Element 2 den Wert <code>flex-grow: 2</code>. Was passiert mit Element 3?</p><p>Tipp: Das Verhältnis gilt für den zusätzlich verteilten Platz. Alle drei Elemente haben bereits eine Ausgangsgrösse.</p></details>
+</section>
+</main>
+<script>
+const get = id => document.getElementById(id);
+const positions = ['flex-start', 'center', 'flex-end'];
+const distribution = [...positions, 'space-between', 'space-around', 'space-evenly'];
+const containerOptions = {
+  'flex-direction': ['row', 'row-reverse', 'column', 'column-reverse'],
+  'flex-wrap': ['nowrap', 'wrap', 'wrap-reverse'],
+  'justify-content': distribution,
+  'align-items': ['stretch', ...positions, 'baseline'],
+  'align-content': ['stretch', ...distribution],
+  gap: ['0px', '8px', '12px', '16px', '24px', '32px']
+};
+const itemOptions = {
+  'flex-grow': ['0', '1', '2', '3'],
+  'flex-shrink': ['1', '0', '2', '3'],
+  'flex-basis': ['96px', 'auto', '48px', '144px', '192px', '256px'],
+  'align-self': ['auto', 'stretch', ...positions, 'baseline'],
+  order: ['0', '-2', '-1', '1', '2']
+};
+const alignmentHelp = {
+  'flex-start': 'Richtet am Anfang der Achse aus.',
+  center: 'Zentriert auf der Achse.',
+  'flex-end': 'Richtet am Ende der Achse aus.',
+  'space-between': 'Verteilt freien Platz gleichmässig zwischen den Elementen oder Zeilen.',
+  'space-around': 'Verteilt freien Platz so, dass die Randabstände halb so gross sind wie die Zwischenräume.',
+  'space-evenly': 'Verteilt freien Platz so, dass Randabstände und Zwischenräume gleich gross sind.',
+  baseline: 'Richtet die Elemente an ihren Textgrundlinien aus.'
+};
+const effects = {
+  'flex-direction': value => ({
+    row: 'Ordnet die Elemente horizontal von links nach rechts an.',
+    'row-reverse': 'Ordnet die Elemente horizontal von rechts nach links an.',
+    column: 'Ordnet die Elemente vertikal von oben nach unten an.',
+    'column-reverse': 'Ordnet die Elemente vertikal von unten nach oben an.'
+  })[value],
+  'flex-wrap': value => ({
+    nowrap: 'Hält alle Elemente auf einer Flex-Zeile. Je nach flex-shrink schrumpfen sie oder laufen über.',
+    wrap: 'Bricht bei Platzmangel in weitere Flex-Zeilen um.',
+    'wrap-reverse': 'Bricht bei Platzmangel um und kehrt die Richtung der Zeilen auf der Querachse um.'
+  })[value],
+  'justify-content': value => 'Hauptachse. ' + alignmentHelp[value],
+  'align-items': value => value === 'stretch'
+    ? 'Streckt Elemente mit automatischer Quergrösse auf die Grösse ihrer Flex-Zeile.'
+    : 'Querachse innerhalb jeder Zeile. ' + alignmentHelp[value],
+  'align-content': value => value === 'stretch'
+    ? 'Verteilt freien Platz auf der Querachse, indem die Flex-Zeilen vergrössert werden. Erfordert aktivierten Umbruch.'
+    : 'Verteilt die Flex-Zeilen auf der Querachse. Erfordert aktivierten Umbruch. ' + alignmentHelp[value],
+  gap: value => 'Setzt den Abstand zwischen benachbarten Elementen und zwischen Flex-Zeilen auf ' + value + '.',
+  'flex-grow': value => value === '0' ? 'Das Element erhält keinen Anteil am freien Platz.' : 'Das Element wächst bei freiem Platz auf der Hauptachse mit dem Faktor ' + value + '.',
+  'flex-shrink': value => value === '0' ? 'Das Element behält bei Platzmangel seine Ausgangsgrösse.' : 'Das Element kann bei Platzmangel schrumpfen. Sein Anteil hängt vom Faktor ' + value + ' und seiner Ausgangsgrösse ab.',
+  'flex-basis': value => value === 'auto' ? 'Verwendet die Breite oder Höhe auf der Hauptachse, falls angegeben. Sonst bestimmt der Inhalt die Ausgangsgrösse.' : 'Setzt die Ausgangsgrösse auf der Hauptachse vor dem Wachsen oder Schrumpfen auf ' + value + '.',
+  'align-self': value => value === 'auto' ? 'Übernimmt die Ausrichtung aus align-items.' : 'Überschreibt align-items für dieses Element. ' + (value === 'stretch' ? 'Streckt es bei automatischer Quergrösse über seine Flex-Zeile.' : alignmentHelp[value]),
+  order: value => 'Zeigt Elemente mit kleineren order-Werten zuerst. Bei gleichem Wert gilt die HTML-Reihenfolge. Aktueller Wert ' + value + '.'
+};
+const tooltips = [];
+function addTooltip(control, explain) {
+  const help = document.createElement('span');
+  help.className = 'help';
+  const tip = document.createElement('span');
+  tip.className = 'tooltip';
+  tip.id = 'tip-' + tooltips.length;
+  tip.setAttribute('role', 'tooltip');
+  tip.hidden = true;
+  const description = [control.getAttribute('aria-describedby'), tip.id].filter(Boolean);
+  control.setAttribute('aria-describedby', description.join(' '));
+  const update = () => { tip.textContent = explain(control.value); };
+  const show = () => { update(); tip.hidden = false; };
+  const hide = () => { tip.hidden = true; };
+  help.addEventListener('pointerenter', show);
+  help.addEventListener('pointerleave', () => {
+    if (document.activeElement !== control) hide();
+  });
+  control.addEventListener('focus', show);
+  control.addEventListener('blur', hide);
+  control.addEventListener('change', show);
+  control.addEventListener('keydown', event => {
+    if (event.key === 'Escape') hide();
+  });
+  control.before(help);
+  help.append(control, tip);
+  tooltips.push(update);
+}
+function addControls(fieldset, options) {
+  return Object.fromEntries(Object.entries(options).map(([property, values]) => {
+    const label = document.createElement('label');
+    const caption = document.createElement('code');
+    caption.textContent = property;
+    const select = document.createElement('select');
+    values.forEach(value => select.add(new Option(value, value)));
+    label.append(caption, select);
+    fieldset.append(label);
+    addTooltip(select, effects[property]);
+    return [property, select];
+  }));
+}
+const containerControls = addControls(get('container-controls'), containerOptions);
+const itemControls = addControls(get('item-controls'), itemOptions);
+const selected = get('selected');
+addTooltip(get('count'), value => 'Zeigt ' + value + ' Flex-Elemente im Container. Mehr Elemente erleichtern das Ausprobieren des Umbruchs.');
+addTooltip(get('width'), value => 'Setzt die Breite auf ' + value + ' % des verfügbaren Platzes. Die Mindestbreite beträgt 240 px.');
+addTooltip(selected, value => 'Markiert Element ' + (Number(value) + 1) + ' in der Vorschau. Die Einstellungen für Flex-Elemente gelten für dieses Element.');
+const stage = get('stage');
+const defaults = Object.fromEntries(Object.entries(itemOptions).map(([key, values]) => [key, values[0]]));
+let items = [];
+function rule(selector, declarations) {
+  const lines = Object.entries(declarations).map(([key, value]) => '  ' + key + ': ' + value + ';');
+  return selector + ' {\n' + lines.join('\n') + '\n}';
+}
+function render() {
+  tooltips.forEach(update => update());
+  const container = { display: 'flex', width: get('width').value + '%', 'min-width': '240px', height: '320px', overflow: 'auto' };
+  Object.entries(containerControls).forEach(([key, control]) => { container[key] = control.value; });
+  Object.entries(container).forEach(([key, value]) => stage.style.setProperty(key, value));
+  get('width-value').value = container.width;
+  const direction = container['flex-direction'];
+  const mainDirection = { row: 'nach rechts', 'row-reverse': 'nach links', column: 'nach unten', 'column-reverse': 'nach oben' };
+  const cross = direction.startsWith('row') ? 'vertikal' : 'horizontal';
+  get('axes').textContent = 'Hauptachse ' + mainDirection[direction] + ' · Querachse ' + cross;
+  const rules = [rule('.flex-container', container), rule('.flex-item', { 'min-width': '0', 'min-height': '0', ...defaults })];
+  stage.replaceChildren();
+  const markup = items.map((item, index) => {
+    const number = index + 1;
+    const box = document.createElement('div');
+    box.className = 'item';
+    box.textContent = number;
+    box.toggleAttribute('data-selected', index === Number(selected.value));
+    Object.entries(item).forEach(([key, value]) => box.style.setProperty(key, value));
+    stage.append(box);
+    const overrides = Object.fromEntries(Object.entries(item).filter(([key, value]) => value !== defaults[key]));
+    const changed = Object.keys(overrides).length > 0;
+    if (changed) rules.push(rule('.item-' + number, overrides));
+    return '  <div class="flex-item' + (changed ? ' item-' + number : '') + '">' + number + '</div>';
+  });
+  get('css').firstElementChild.textContent = rules.join('\n\n');
+  get('html').firstElementChild.textContent = '<div class="flex-container">\n' + markup.join('\n') + '\n</div>';
+  get('status').textContent = '';
+}
+function syncSelection() {
+  const item = items[Number(selected.value)];
+  Object.entries(itemControls).forEach(([key, control]) => { control.value = item[key]; });
+  render();
+}
+function syncCount() {
+  const input = get('count');
+  const count = Math.max(1, Math.min(9, Math.trunc(input.valueAsNumber || 3)));
+  input.value = count;
+  const index = Math.min(Number(selected.value), count - 1);
+  items = Array.from({ length: count }, (_, i) => items[i] || { ...defaults });
+  selected.replaceChildren(...items.map((_, i) => new Option('Element ' + (i + 1), i)));
+  selected.value = index;
+  syncSelection();
+}
+function reset() {
+  items = [];
+  get('count').value = 3;
+  get('width').value = 100;
+  Object.values(containerControls).forEach(control => { control.selectedIndex = 0; });
+  containerControls.gap.value = '12px';
+  selected.value = '0';
+  syncCount();
+}
+Object.values(containerControls).forEach(control => control.addEventListener('change', render));
+Object.entries(itemControls).forEach(([key, control]) => {
+  control.addEventListener('change', () => {
+    items[Number(selected.value)][key] = control.value;
+    render();
+  });
+});
+get('count').addEventListener('change', syncCount);
+get('width').addEventListener('input', render);
+selected.addEventListener('change', syncSelection);
+get('reset').addEventListener('click', reset);
+get('copy').addEventListener('click', async () => {
+  const code = get('css').firstElementChild;
+  try {
+    await navigator.clipboard.writeText(code.textContent);
+    get('status').textContent = 'CSS kopiert.';
+  } catch {
+    const range = document.createRange();
+    range.selectNodeContents(code);
+    const selection = window.getSelection();
+    selection.removeAllRanges();
+    selection.addRange(range);
+    get('status').textContent = 'CSS markiert. Kopiere ihn mit Ctrl+C oder ⌘C.';
+  }
+});
+reset();
+</script>
+</body>
+</html>
